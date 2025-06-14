@@ -1,6 +1,7 @@
 # gee_fetch.py
 import ee
 import os
+import json
 import requests
 
 def authenticate_gee():
