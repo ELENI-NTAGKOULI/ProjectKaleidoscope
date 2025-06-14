@@ -2,8 +2,9 @@
 # This is the CLI entry point to run the full optimization pipeline
 
 import argparse
-from optimization import gee_fetch, grid, mcda, nsga, export_utils
+import gee_fetch, grid, mcda, nsga, export_utils
 import warnings
+from nsga import create_results_dataframe
 warnings.filterwarnings("ignore")
 
 def main():
@@ -31,10 +32,25 @@ def main():
     # Step 4: Run MCDA to create composite suitability
     composite, composite_norm = mcda.compute_composite(rasters)
 
-    # Step 5: Normalize for NSGA-II and run optimization
-    results_df, selected_patches = nsga.run_nsga_pipeline(valid_patches)
+    # Step 5: Run NSGA-II optimization
+    _, raw_selected_patches = nsga.run_nsga_pipeline(valid_patches)
 
-    # Step 6: Export results
+    # Normalize patch format
+    selected_patches = []
+    for p in raw_selected_patches:
+        if hasattr(p, 'fitness'):
+            selected_patches.append(p)
+        elif isinstance(p, (list, tuple)) and isinstance(p[0], int):
+            selected_patches.append(creator.Individual(p))
+        elif isinstance(p, int):
+            selected_patches.append(creator.Individual([p]))
+        else:
+            print(f"⚠️ Unexpected patch format skipped: {type(p)}")
+
+    # Step 6: Create DataFrame with results
+    results_df = create_results_dataframe(selected_patches, valid_patches)
+
+    # Step 7: Export results
     export_utils.save_results(results_df, selected_patches, valid_patches, output_dir=args.output)
 
     print("\n✅ Optimization complete. Results saved to:", args.output)

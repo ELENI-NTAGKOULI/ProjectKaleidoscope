@@ -74,7 +74,7 @@ def select_spatially_distributed(pop, df, min_dist, n):
             break
         idx = c[0]
         pt = np.array([[df.iloc[idx]['centroid_x'], df.iloc[idx]['centroid_y']]])
-        if all(cdist(pt, np.array(centroids)).min() >= min_dist if centroids else True):
+        if not centroids or cdist(pt, np.array(centroids)).min() >= min_dist:
             selected.append(c)
             centroids.append(pt[0])
     print(f"✅ Selected {len(selected)} spatial patches")
@@ -95,3 +95,61 @@ def summarize_results(selected, df):
             **{col: row[col] for col in ['slope', 'soil', 'floodRisk', 'urbanProximity', 'landcoverSuitability']}
         })
     return pd.DataFrame(records)
+def create_results_dataframe(selected_patches, patch_data):
+    import pandas as pd
+    import geopandas as gpd
+
+    results = []
+
+    for i, patch in enumerate(selected_patches):
+        # ✅ Robust patch index extraction
+        try:
+            if hasattr(patch, "fitness") and isinstance(patch[0], int):
+                idx = patch[0]  # DEAP individual
+            elif isinstance(patch, int):
+                idx = patch
+            elif isinstance(patch, pd.Series) and 'patch_id' in patch:
+                idx = int(patch['patch_id'])
+            else:
+                raise ValueError(f"Unrecognized patch format at index {i}: {type(patch)}")
+        except Exception as e:
+            print(f"⚠️ Skipping patch {i}: couldn't extract index - {e}")
+            continue
+
+        try:
+            patch_row = patch_data.iloc[idx]
+            geom = patch_row.geometry
+            minx, miny, maxx, maxy = geom.bounds
+
+            # Convert to UTM if needed
+            if patch_data.crs != 'EPSG:25831':
+                patch_gdf = gpd.GeoDataFrame([patch_row], geometry='geometry', crs=patch_data.crs)
+                patch_gdf = patch_gdf.to_crs('EPSG:25831')
+                geom_utm = patch_gdf.geometry.iloc[0]
+                minx, miny, maxx, maxy = geom_utm.bounds
+                centroid = geom_utm.centroid
+            else:
+                centroid = geom.centroid
+
+            results.append({
+                'rank': i + 1,
+                'patch_id': idx,
+                'centroid_longitude': patch_row['centroid_x'],
+                'centroid_latitude': patch_row['centroid_y'],
+                'centroid_x_utm31n': centroid.x,
+                'centroid_y_utm31n': centroid.y,
+                'bbox_coordinates_utm31n': f"{minx:.2f},{miny:.2f},{maxx:.2f},{maxy:.2f}",
+                'landcoverSuitability': patch_row.get('landcoverSuitability', 0),
+                'slope': patch_row.get('slope', 0),
+                'soil': patch_row.get('soil', 0),
+                'floodRisk': patch_row.get('floodRisk', 0),
+                'urbanProximity': patch_row.get('urbanProximity', 0),
+                'overall_score': sum(patch.fitness.values) if hasattr(patch, 'fitness') else 0
+            })
+        except Exception as e:
+            print(f"⚠️ Failed to process patch {idx}: {e}")
+            continue
+
+    return pd.DataFrame(results)
+
+
