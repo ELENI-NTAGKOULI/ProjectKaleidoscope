@@ -16,3 +16,4 @@ plotly
 streamlit
 markdown
 pdfkit
+supabase
