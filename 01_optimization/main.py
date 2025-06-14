@@ -12,7 +12,7 @@ def main():
     parser.add_argument("--lon", type=float, default=2.9862, help="Longitude of study area center")
     parser.add_argument("--lat", type=float, default=42.0553, help="Latitude of study area center")
     parser.add_argument("--buffer_km", type=int, default=10, help="Buffer radius in km")
-    parser.add_argument("--output", type=str, default="results", help="Output folder")
+    parser.add_argument("--output", type=str, default="05_results", help="Output folder")
     args = parser.parse_args()
 
     print("\n🚀 Starting optimization pipeline...")
