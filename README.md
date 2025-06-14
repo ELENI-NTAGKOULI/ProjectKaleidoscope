@@ -18,4 +18,4 @@ BeaversTank/
 ├── config.yaml              # Central config for weights, parameters, paths
 ├── requirements.txt         # Project dependencies
 ├── .gitignore               # Files/folders to exclude from Git
-└── README.md                # You're here!
+└── README.md                # You're here :)
