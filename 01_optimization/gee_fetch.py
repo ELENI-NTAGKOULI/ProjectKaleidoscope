@@ -5,13 +5,22 @@ import requests
 
 def authenticate_gee():
     try:
-        ee.Initialize()
-        print("✅ GEE already authenticated")
-    except Exception:
-        print("🔐 Authenticating Google Earth Engine...")
-        ee.Authenticate()
-        ee.Initialize()
-        print("✅ GEE authenticated")
+        service_account = 'gee-runner@gee-runner.iam.gserviceaccount.com'
+        
+        # Load service account JSON from environment variable
+        credentials_json = os.environ.get('GCP_SERVICE_ACCOUNT')
+        if not credentials_json:
+            raise Exception("Missing GCP_SERVICE_ACCOUNT environment variable")
+
+        credentials_dict = json.loads(credentials_json)
+        credentials = ee.ServiceAccountCredentials(service_account, None, credentials_dict)
+
+        ee.Initialize(credentials)
+        print("✅ GEE authenticated using service account")
+
+    except Exception as e:
+        print("❌ Failed to authenticate GEE:", e)
+        raise
 
 def create_study_region(center_lon, center_lat, buffer_km=10):
     point = ee.Geometry.Point([center_lon, center_lat])
