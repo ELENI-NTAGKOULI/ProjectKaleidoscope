@@ -17,7 +17,7 @@ def get_latest_coordinates():
     if not url or not key:
         raise ValueError("Missing Supabase credentials")
 
-    client = supabase.create_client(url, key)
+    client = create_client(url, key)
     response = client.table(table).select("lat, lng").order("created_at", desc=True).limit(1).execute()
 
     if response.data and len(response.data) > 0:
