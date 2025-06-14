@@ -5,6 +5,8 @@ import os
 import supabase
 import json
 from nsga import create_results_dataframe
+from supabase import create_client, Client
+
 
 warnings.filterwarnings("ignore")
 
