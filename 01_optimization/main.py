@@ -2,7 +2,6 @@ import argparse
 import gee_fetch, grid, mcda, nsga, export_utils
 import warnings
 import os
-import supabase
 import json
 from nsga import create_results_dataframe
 from supabase import create_client, Client
