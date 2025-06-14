@@ -1,25 +1,44 @@
-# main.py
-# This is the CLI entry point to run the full optimization pipeline
-
 import argparse
 import gee_fetch, grid, mcda, nsga, export_utils
 import warnings
+import os
+import supabase
+import json
 from nsga import create_results_dataframe
+
 warnings.filterwarnings("ignore")
+
+def get_latest_coordinates():
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    table = os.environ.get("SUPABASE_TABLE", "projects")
+
+    if not url or not key:
+        raise ValueError("Missing Supabase credentials")
+
+    client = supabase.create_client(url, key)
+    response = client.table(table).select("lat, lng").order("created_at", desc=True).limit(1).execute()
+
+    if response.data and len(response.data) > 0:
+        coords = response.data[0]
+        return float(coords['lng']), float(coords['lat'])
+    else:
+        raise ValueError("No coordinates found in Supabase table")
 
 def main():
     parser = argparse.ArgumentParser(description="Run NSGA-II Flood Mitigation Optimization")
-    parser.add_argument("--lon", type=float, default=2.9862, help="Longitude of study area center")
-    parser.add_argument("--lat", type=float, default=42.0553, help="Latitude of study area center")
     parser.add_argument("--buffer_km", type=int, default=10, help="Buffer radius in km")
     parser.add_argument("--output", type=str, default="05_results", help="Output folder")
     args = parser.parse_args()
 
     print("\n🚀 Starting optimization pipeline...")
 
+    # Load latest coordinates from Supabase
+    center_lon, center_lat = get_latest_coordinates()
+
     # Step 1: Authenticate and download GEE data
     files, region_geojson = gee_fetch.setup_data_automatically(
-        center_lon=args.lon, center_lat=args.lat, buffer_km=args.buffer_km, output_folder=args.output
+        center_lon=center_lon, center_lat=center_lat, buffer_km=args.buffer_km, output_folder=args.output
     )
 
     # Step 2: Load and validate rasters
@@ -35,7 +54,6 @@ def main():
     # Step 5: Run NSGA-II optimization
     _, raw_selected_patches = nsga.run_nsga_pipeline(valid_patches)
 
-    # Normalize patch format
     selected_patches = []
     for p in raw_selected_patches:
         if hasattr(p, 'fitness'):
