@@ -13,8 +13,7 @@ def authenticate_gee():
         if not credentials_json:
             raise Exception("Missing GCP_SERVICE_ACCOUNT environment variable")
 
-        credentials_dict = json.loads(credentials_json)
-        credentials = ee.ServiceAccountCredentials(service_account, None, credentials_dict)
+        credentials = ee.ServiceAccountCredentials(service_account, key_data=credentials_json)
 
         ee.Initialize(credentials)
         print("✅ GEE authenticated using service account")
