@@ -7,14 +7,14 @@ Inside this repo you’ll find two AI sidekicks working together. One (NSGA opti
 
 ```bash
 BeaversTank/
-├── optimization/            # GEE data fetch, MCDA, NSGA-II patch optimization
-├── simulation/              # Mesa-based flood simulation with/without NBS
-├── frontend/                # Interactive maps, charts, UI (Leaflet, Streamlit, etc.)
-├── data/                    # Input data: DEM, rivers, GEE layers, etc.
-├── results/                 # Output patches, plots, and exported analysis
-├── reports/                 # 
-├── scripts/                 # CLI tools to run pipeline or launch dashboard
-├── notebooks/               # (Optional) Jupyter exploration & testing
+├── 01_optimization/            # GEE data fetch, MCDA, NSGA-II patch optimization
+├── 02_simulation/              # Mesa-based flood simulation with/without NBS
+├── 03_frontend/                # Interactive maps, charts, UI (Leaflet, Streamlit, etc.)
+├── 04_data/                    # Input data: DEM, rivers, GEE layers, etc.
+├── 05_results/                 # Output patches, plots, and exported analysis
+├── 06_reports/                 # Final compiled reports
+├── 07_scripts/                 # CLI tools to run pipeline or launch dashboard
+├── 08_notebooks/               # Jupyter exploration & testing (if so)
 ├── config.yaml              # Central config for weights, parameters, paths
 ├── requirements.txt         # Project dependencies
 ├── .gitignore               # Files/folders to exclude from Git
