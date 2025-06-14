@@ -47,8 +47,7 @@ def insert_top_patches_to_supabase(df):
             "soil": float(row["soil"]),
             "floodRisk": float(row["floodRisk"]),
             "urbanProximity": float(row["urbanProximity"]),
-            "overall_score": float(row["overall_score"]),
-            "created_at": float(datetime.utcnow().timestamp())
+            "overall_score": float(row["overall_score"])            
         })
 
     client.table(table).insert(rows).execute()
