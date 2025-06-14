@@ -26,6 +26,33 @@ def get_latest_coordinates():
     else:
         raise ValueError("No coordinates found in Supabase table")
 
+def insert_top_patches_to_supabase(df):
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    table = os.environ.get("SUPABASE_RESULTS_TABLE", "optimized_patches")
+
+    client = create_client(url, key)
+
+    top5 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(5)
+
+    rows = []
+    for _, row in top5.iterrows():
+        rows.append({
+            "patch_id": int(row["patch_id"]),
+            "centroid_latitude": float(row["centroid_latitude"]),
+            "centroid_longitude": float(row["centroid_longitude"]),
+            "bbox_coordinates_utm31n": row["bbox_coordinates_utm31n"],
+            "landcoverSuitability": float(row["landcoverSuitability"]),
+            "slope": float(row["slope"]),
+            "soil": float(row["soil"]),
+            "floodRisk": float(row["floodRisk"]),
+            "urbanProximity": float(row["urbanProximity"]),
+            "overall_score": float(row["overall_score"]),
+            "created_at": float(datetime.utcnow().timestamp())
+        })
+
+    client.table(table).insert(rows).execute()
+
 def main():
     parser = argparse.ArgumentParser(description="Run NSGA-II Flood Mitigation Optimization")
     parser.add_argument("--buffer_km", type=int, default=10, help="Buffer radius in km")
@@ -71,6 +98,8 @@ def main():
 
     # Step 7: Export results
     export_utils.save_results(results_df, selected_patches, valid_patches, output_dir=args.output)
+
+    insert_top_patches_to_supabase(results_df)
 
     print("\n✅ Optimization complete. Results saved to:", args.output)
 
