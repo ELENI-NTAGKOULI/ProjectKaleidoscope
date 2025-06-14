@@ -16,4 +16,5 @@ plotly
 streamlit
 markdown
 pdfkit
-supabase
+supabase-py
+
