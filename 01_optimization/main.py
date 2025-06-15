@@ -5,6 +5,8 @@ import os
 import json
 from nsga import create_results_dataframe
 from supabase import create_client, Client
+from pyproj import Transformer
+
 
 
 warnings.filterwarnings("ignore")
@@ -35,19 +37,26 @@ def insert_top_patches_to_supabase(df):
 
     top5 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(5)
 
+    transformer = Transformer.from_crs("epsg:32631", "epsg:4326", always_xy=True)
+
     rows = []
     for _, row in top5.iterrows():
+        # Convert UTM to lat/lon
+        utm_x = float(row["centroid_longitude"])
+        utm_y = float(row["centroid_latitude"])
+        lon, lat = transformer.transform(utm_x, utm_y)
+
         rows.append({
             "patch_id": int(row["patch_id"]),
-            "centroid_latitude": float(row["centroid_latitude"]),
-            "centroid_longitude": float(row["centroid_longitude"]),
+            "centroid_latitude": lat,
+            "centroid_longitude": lon,
             "bbox_coordinates_utm31n": row["bbox_coordinates_utm31n"],
             "landcoverSuitability": float(row["landcoverSuitability"]),
             "slope": float(row["slope"]),
             "soil": float(row["soil"]),
             "floodRisk": float(row["floodRisk"]),
             "urbanProximity": float(row["urbanProximity"]),
-            "overall_score": float(row["overall_score"])            
+            "overall_score": float(row["overall_score"])
         })
 
     client.table(table).insert(rows).execute()
