@@ -88,11 +88,16 @@ def insert_top_patches_to_supabase(df):
 
     # Prepare UTM to lat/lon transformer
     transformer = Transformer.from_crs("epsg:32631", "epsg:4326", always_xy=True)
-    
+
     rows = []
     for _, row in top5.iterrows():
         utm_x = float(row["centroid_longitude"])
         utm_y = float(row["centroid_latitude"])
+        
+            # Skip invalid UTM data
+        if utm_x > 180 or utm_y > 90:
+            print(f"⚠️ Skipping invalid UTM row: patch_id {row['patch_id']}")
+            continue
         lon, lat = transformer.transform(utm_x, utm_y)
 
         rows.append({
