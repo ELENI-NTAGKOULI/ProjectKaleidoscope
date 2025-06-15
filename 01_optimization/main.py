@@ -63,7 +63,7 @@ def main():
     # Load latest coordinates from Supabase
     center_lon, center_lat = get_latest_coordinates()
 
-    # Step 1: Authenticate and download GEE data
+    # Step 1:  Authenticate and download GEE data
     files, region_geojson = gee_fetch.setup_data_automatically(
         center_lon=center_lon, center_lat=center_lat, buffer_km=args.buffer_km, output_folder=args.output
     )
