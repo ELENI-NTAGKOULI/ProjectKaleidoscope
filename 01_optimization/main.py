@@ -80,7 +80,7 @@ def main():
 def insert_top_patches_to_supabase(df):
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_KEY")
-    table = os.environ.get("SUPABASE_RESULTS_TABLE", "optimized_patches")
+    table = os.environ.get("SUPABASE_RESULTS_TABLE", "results")
 
     client = create_client(url, key)
 
@@ -93,7 +93,7 @@ def insert_top_patches_to_supabase(df):
     for _, row in top5.iterrows():
         utm_x = float(row["centroid_longitude"])
         utm_y = float(row["centroid_latitude"])
-        
+
             # Skip invalid UTM data
         if utm_x > 180 or utm_y > 90:
             print(f"⚠️ Skipping invalid UTM row: patch_id {row['patch_id']}")
