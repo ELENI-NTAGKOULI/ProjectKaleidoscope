@@ -78,29 +78,35 @@ def main():
     print("\n✅ Optimization complete. Results saved to:", args.output)
 
 def insert_top_patches_to_supabase(df):
+    from pyproj import Transformer
+    import os
+    from supabase import create_client
+
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_KEY")
     table = os.environ.get("SUPABASE_RESULTS_TABLE", "results")
 
     client = create_client(url, key)
 
+    # Επιλέγουμε τα 5 κορυφαία patch
     top5 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(5)
 
-    # Prepare UTM to lat/lon transformer
+    # Προετοιμασία μετατροπέα από UTM (EPSG:32631) σε γεωγραφικό (EPSG:4326)
     transformer = Transformer.from_crs("epsg:32631", "epsg:4326", always_xy=True)
 
     rows = []
     for _, row in top5.iterrows():
-        utm_x = float(row["centroid_longitude"])
-        utm_y = float(row["centroid_latitude"])
+        utm_x = float(row["centroid_longitude"])  # actually UTM_X
+        utm_y = float(row["centroid_latitude"])   # actually UTM_Y
 
-        
         lon, lat = transformer.transform(utm_x, utm_y)
 
         rows.append({
             "patch_id": int(row["patch_id"]),
-            "centroid_latitude": lat,
-            "centroid_longitude": lon,
+            "centroid_latitude": lat,              # ✔️ transformed
+            "centroid_longitude": lon,             # ✔️ transformed
+            "centroid_x_utm31n": utm_x,            # optional, raw UTM x
+            "centroid_y_utm31n": utm_y,            # optional, raw UTM y
             "bbox_coordinates_utm31n": row["bbox_coordinates_utm31n"],
             "landcoverSuitability": float(row["landcoverSuitability"]),
             "slope": float(row["slope"]),
@@ -111,6 +117,7 @@ def insert_top_patches_to_supabase(df):
         })
 
     client.table(table).insert(rows).execute()
+
 
 if __name__ == "__main__":
     main()
