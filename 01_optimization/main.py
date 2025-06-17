@@ -81,6 +81,7 @@ def insert_top_patches_to_supabase(df):
     from pyproj import Transformer
     import os
     from supabase import create_client
+    from datetime import datetime, timezone
 
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_KEY")
@@ -113,10 +114,12 @@ def insert_top_patches_to_supabase(df):
             "soil": float(row["soil"]),
             "floodRisk": float(row["floodRisk"]),
             "urbanProximity": float(row["urbanProximity"]),
-            "overall_score": float(row["overall_score"])
+            "overall_score": float(row["overall_score"]),
+            "created_at": datetime.now(timezone.utc).isoformat()
         })
 
-    client.table(table).insert(rows).execute()
+    client.table("results").select("*").order("created_at", desc=True).limit(5).execute()
+
 
 
 if __name__ == "__main__":
