@@ -1,13 +1,14 @@
 import os
-from flask import Flask, request, jsonify
 import subprocess
+from flask import Flask, request, jsonify
+from flask_cors import CORS  # 🔥
 
 app = Flask(__name__)
+CORS(app)  # 🔥 επιτρέπει cross-origin requests (απαραίτητο για Railway + frontend)
 
 @app.route("/trigger", methods=["POST"])
 def trigger_pipeline():
     try:
-        # Τρέξε το optimization script
         subprocess.run(["python", "01_optimization/main.py"], check=True)
         return jsonify({"status": "success", "message": "Optimization started"}), 200
     except subprocess.CalledProcessError:

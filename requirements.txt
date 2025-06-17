@@ -19,5 +19,5 @@ pdfkit
 supabase==1.0.3
 pyproj==3.6.1
 flask
-
+flask-cors
 
