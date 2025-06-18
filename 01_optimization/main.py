@@ -93,8 +93,6 @@ def insert_top_patches_to_supabase(df):
 
     rows = []
     for _, row in top5.iterrows():
-
-
         rows.append({
             "patch_id": int(row["patch_id"]),
             "centroid_latitude": float(row["centroid_latitude"]),      # raw UTM_Y
