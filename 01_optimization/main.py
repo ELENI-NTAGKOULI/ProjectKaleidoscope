@@ -96,7 +96,7 @@ def insert_top_patches_to_supabase(df):
         rows.append({
             "patch_id": int(row["patch_id"]),
             "centroid_latitude": float(row["centroid_latitude"]),      # rawUTM_Y
-            "centroid_longitude": float(row["centroid_longitude"]),    # rawUTM_X
+            "centroid_longitude": float(row["centroid_longitude"]),    # raw UTM_X
             "bbox_coordinates_utm31n": row["bbox_coordinates_utm31n"],    
             "landcoverSuitability": float(row["landcoverSuitability"]),
             "slope": float(row["slope"]),
