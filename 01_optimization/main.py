@@ -86,28 +86,17 @@ def insert_top_patches_to_supabase(df):
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_KEY")
     table = os.environ.get("SUPABASE_RESULTS_TABLE", "results")
-
     client = create_client(url, key)
 
-    # Επιλέγουμε τα 5 κορυφαία patch
+    # Επιλέγουμε τα top 5
     top5 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(5)
-
-    # Προετοιμασία μετατροπέα από UTM (EPSG:32631) σε γεωγραφικό (EPSG:4326)
-    transformer = Transformer.from_crs("epsg:32631", "epsg:4326", always_xy=True)
 
     rows = []
     for _, row in top5.iterrows():
-        utm_x = float(row["centroid_longitude"])  # actually UTM_X
-        utm_y = float(row["centroid_latitude"])   # actually UTM_Y
-
-        lon, lat = transformer.transform(utm_x, utm_y)
-
         rows.append({
             "patch_id": int(row["patch_id"]),
-            "centroid_latitude": lat,              # ✔️ transformed
-            "centroid_longitude": lon,             # ✔️ transformed
-            "centroid_x_utm31n": utm_x,            # optional, raw UTM x
-            "centroid_y_utm31n": utm_y,            # optional, raw UTM y
+            "centroid_latitude": float(row["centroid_latitude"]),      # raw UTM_Y
+            "centroid_longitude": float(row["centroid_longitude"]),    # raw UTM_X
             "bbox_coordinates_utm31n": row["bbox_coordinates_utm31n"],
             "landcoverSuitability": float(row["landcoverSuitability"]),
             "slope": float(row["slope"]),
