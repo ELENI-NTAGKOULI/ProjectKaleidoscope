@@ -91,19 +91,9 @@ def insert_top_patches_to_supabase(df):
     # Επιλέγουμε τα top 5
     top5 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(5)
 
-    bbox_transformer = Transformer.from_crs("EPSG:25831", "EPSG:4326", always_xy=True)
-
     rows = []
     for _, row in top5.iterrows():
 
-        try:
-            min_x, min_y, max_x, max_y = map(float, row["bbox_coordinates_utm31n"].split(","))
-            lon_min, lat_min = bbox_transformer.transform(min_x, min_y)
-            lon_max, lat_max = bbox_transformer.transform(max_x, max_y)
-            final_bbox = f"{lon_min:.5f},{lat_min:.5f},{lon_max:.5f},{lat_max:.5f}"
-        except Exception as e:
-            print(f"⚠️ Error transforming bbox: {e}")
-            final_bbox = ""
 
         rows.append({
             "patch_id": int(row["patch_id"]),
