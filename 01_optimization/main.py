@@ -106,6 +106,7 @@ def insert_top_patches_to_supabase(df):
             "overall_score": float(row["overall_score"]),
             "created_at": datetime.now(timezone.utc).isoformat()
         })
+    response = client.table("results").insert(rows).execute()
 
     client.table("results").select("*").order("created_at", desc=True).limit(5).execute()
 
