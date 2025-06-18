@@ -95,8 +95,8 @@ def insert_top_patches_to_supabase(df):
     for _, row in top5.iterrows():
         rows.append({
             "patch_id": int(row["patch_id"]),
-            "centroid_latitude": float(row["centroid_latitude"]),      # raw UTM_Y
-            "centroid_longitude": float(row["centroid_longitude"]),    # raw UTM_X
+            "centroid_latitude": float(row["centroid_latitude"]),      # rawUTM_Y
+            "centroid_longitude": float(row["centroid_longitude"]),    # rawUTM_X
             "bbox_coordinates_utm31n": row["bbox_coordinates_utm31n"],    
             "landcoverSuitability": float(row["landcoverSuitability"]),
             "slope": float(row["slope"]),
@@ -107,6 +107,7 @@ def insert_top_patches_to_supabase(df):
             "created_at": datetime.now(timezone.utc).isoformat()
         })
     response = client.table("results").insert(rows).execute()
+    
 
 if __name__ == "__main__":
     main()
