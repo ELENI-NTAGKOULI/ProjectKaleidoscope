@@ -108,9 +108,6 @@ def insert_top_patches_to_supabase(df):
         })
     response = client.table("results").insert(rows).execute()
 
-    client.table("results").select("*").order("created_at", desc=True).limit(5).execute()
-
-
 
 if __name__ == "__main__":
     main()
