@@ -27,6 +27,8 @@ def main():
     # Create full results dataframe
     final_df = create_results_dataframe(raw_selected, valid_patches)
 
+    final_df = final_df.drop_duplicates(subset="patch_id", keep="first")
+
     # Export to CSV + GeoJSON
     csv_path = os.path.join(args.output, "selected_patches.csv")
     final_df.to_csv(csv_path, index=False)
