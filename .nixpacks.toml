@@ -4,5 +4,5 @@ nixPkgs = [
   "gdal",
   "libGL",
   "pkg-config",
-  "libexpat"
+  "libexpat" # fix rasterio bug
 ]
