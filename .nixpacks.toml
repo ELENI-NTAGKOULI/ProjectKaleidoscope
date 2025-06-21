@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = [
-  "expat",
-  "gdal",
-  "libGL",
-  "pkg-config",
-  "libexpat" # fix rasterio bug
-]
