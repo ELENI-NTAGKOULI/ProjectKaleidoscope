@@ -43,14 +43,15 @@ def upload_rasters_to_supabase(files_dict, project_id):
         if not os.path.exists(path):
             continue
         supabase_path = f"{project_id}/{name}.tif"
-        client.storage.from_(bucket).upload_from_path(
-            supabase_path,
-            path,
-            file_options={
-                "content-type": "image/tiff",
-                "x-upsert": "true"
-            }
-        )
+        with open(path, "rb") as f:
+            client.storage.from_(bucket).upload(
+                supabase_path,
+                f,
+                {
+                    "content-type": "image/tiff",
+                    "x-upsert": "true"
+                }
+            )
         public_url = f"{os.environ['SUPABASE_URL']}/storage/v1/object/public/{bucket}/{supabase_path}"
         urls[name] = public_url
         print(f"🟢 Uploaded {name}.tif to Supabase: {public_url}")
