@@ -1,7 +1,0 @@
-flask
-rio-tiler
-rasterio
-gunicorn
-requests
-python-dotenv
-supabase
