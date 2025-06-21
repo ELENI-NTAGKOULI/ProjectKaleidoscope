@@ -5,6 +5,8 @@ import gee_fetch, grid, mcda
 import rasterio
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 from utils import get_latest_coordinates, get_supabase_client
+import subprocess
+
 
 warnings.filterwarnings("ignore")
 
@@ -96,7 +98,7 @@ def main():
     patch_grid = grid.create_patch_grid(rasters["study_area"], grid_size=1000)
     valid_patches = grid.extract_patch_statistics(patch_grid, rasters)
 
-    subprocess.run(["python", "tile_server/tile_launcher.py"])
+    
 
     # Export valid patches for next step
     valid_path = os.path.join(args.output, "valid_patches.geojson")
