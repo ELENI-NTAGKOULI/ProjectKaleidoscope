@@ -1,2 +1,8 @@
 [phases.setup]
-nixPkgs = ["expat", "gdal", "libGL", "pkg-config"]
+nixPkgs = [
+  "expat",
+  "gdal",
+  "libGL",
+  "pkg-config",
+  "libexpat"
+]
