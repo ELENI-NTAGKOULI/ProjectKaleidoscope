@@ -5,8 +5,13 @@ import os
 
 def start_tile_server():
     process = subprocess.Popen(
-        ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"],
-        cwd="tile_server"
+        [
+            "gunicorn",
+            "app:app",
+            "-k", "uvicorn.workers.UvicornWorker",  # 👈 Χρήση ASGI worker για FastAPI
+            "--bind", "0.0.0.0:8000"
+        ],
+        cwd="tile_server"  # 👈 Εκτέλεση μέσα στον φάκελο tile_server
     )
     print("🟢 Tile server started on port 8000")
     return process
