@@ -4,7 +4,6 @@ from utils import get_supabase_client
 import os
 import requests
 from rio_tiler.io import COGReader
-from rio_tiler.utils import tile_exists
 from mercantile import tiles
 from tempfile import NamedTemporaryFile
 
