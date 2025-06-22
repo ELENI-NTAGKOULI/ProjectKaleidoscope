@@ -1,13 +1,12 @@
 from fastapi import FastAPI, Request
 from starlette.responses import JSONResponse
-import rasterio
-from rasterio.vrt import WarpedVRT
-from rasterio.enums import Resampling
-from rasterio.io import MemoryFile
-import os
-import tempfile
-import requests
 from utils import get_supabase_client
+import os
+import requests
+from rio_tiler.io import COGReader
+from rio_tiler.utils import tile_exists
+from mercantile import tiles
+from tempfile import NamedTemporaryFile
 
 app = FastAPI()
 
@@ -16,38 +15,56 @@ def health():
     return {"status": "ok"}
 
 @app.post("/run-tiling")
-async def run_tiling(req: Request):
-    data = await req.json()
+async def run_tiling(request: Request):
+    data = await request.json()
     project_id = data.get("project_id")
     if not project_id:
-        return JSONResponse(status_code=400, content={"error": "project_id missing"})
+        return JSONResponse(status_code=400, content={"error": "Missing project_id"})
 
-    # Example: For each layer, fetch tif from Supabase and upload a single PNG tile (simplified)
-    layers = ["floodRisk", "landcoverSuitability", "slope", "soil", "study_area", "urbanProximity"]
     supabase = get_supabase_client()
     bucket = "raster-exports"
 
+    # Τα layers που θες να κάνεις tiling
+    layers = ["study_area", "urbanProximity", "slope", "soil", "landcoverSuitability", "floodRisk"]
+
     for layer in layers:
-        url = f"{os.environ['SUPABASE_URL']}/storage/v1/object/public/{bucket}/{project_id}/{layer}.tif"
-        response = requests.get(url)
-        with MemoryFile(response.content) as memfile:
-            with memfile.open() as dataset:
-                # Here you'd use rio_tiler to generate tiles and upload each tile to Supabase
-                # Simulated example below (not actual tiling!)
-                temp_path = f"/tmp/{layer}_sample.png"
-                # e.g. use dataset.read(...) to save one tile
-                # upload to Supabase in: f"{project_id}/tiles/{layer}/14/8571/5670.png"
+        print(f"\n🟡 Tiling {layer}...")
 
-                with open(temp_path, "wb") as f:
-                    f.write(b"fake_png_tile_data")  # 👈 placeholder
+        # Δημιουργία URL
+        tif_url = f"{os.environ['SUPABASE_URL']}/storage/v1/object/public/{bucket}/{project_id}/{layer}.tif"
 
-                with open(temp_path, "rb") as f:
-                    supabase.storage.from_("raster-exports").upload(
-                        f"{project_id}/tiles/{layer}/14/8571/5670.png", f, {
-                            "content-type": "image/png",
-                            "x-upsert": "true"
-                        }
-                    )
-                print(f"🟢 Uploaded tile for layer: {layer}")
+        # Κατέβασε προσωρινά το GeoTIFF
+        tif_resp = requests.get(tif_url)
+        if tif_resp.status_code != 200:
+            print(f"❌ Could not fetch {layer}.tif")
+            continue
+
+        with NamedTemporaryFile(suffix=".tif") as tmp:
+            tmp.write(tif_resp.content)
+            tmp.flush()
+
+            with COGReader(tmp.name) as cog:
+                bounds = cog.bounds
+                min_zoom = 13
+                max_zoom = 14  # μπορείς να το κάνεις 15 ή 16 για πιο high-res
+
+                for z in range(min_zoom, max_zoom + 1):
+                    for tile in tiles(*bounds, z):
+                        if not tile_exists(cog.tile_bounds(tile.x, tile.y, tile.z), bounds):
+                            continue
+
+                        try:
+                            img = cog.tile(tile.x, tile.y, tile.z)
+                            data = img.render(img_format="PNG")
+
+                            path = f"{project_id}/tiles/{layer}/{z}/{tile.x}/{tile.y}.png"
+                            supabase.storage.from_("raster-exports").upload(
+                                path,
+                                data,
+                                {"content-type": "image/png", "x-upsert": "true"}
+                            )
+                            print(f"✅ Uploaded tile {path}")
+                        except Exception as e:
+                            print(f"⚠️ Skipped tile z{z}/{tile.x}/{tile.y}: {e}")
 
     return {"status": "tiling complete"}
