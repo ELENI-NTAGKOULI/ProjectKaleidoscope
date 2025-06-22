@@ -11,7 +11,7 @@ def start_tile_server():
     print("🟢 Tile server started on port 8000")
     return process
 
-def wait_for_tile_server(timeout=15):
+def wait_for_tile_server(timeout=80):
     for _ in range(timeout):
         try:
             r = requests.get("http://localhost:8000/health")
