@@ -27,4 +27,5 @@ rio-tiler
 fastapi
 uvicorn[standard]
 gunicorn>=20.1.0
+mercantile
 
