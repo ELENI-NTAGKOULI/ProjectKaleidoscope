@@ -16,8 +16,8 @@ def health():
     return {"status": "ok"}
 
 @app.post("/run-tiling")
-def run_tiling(req: Request):
-    data = req.json()
+async def run_tiling(req: Request):
+    data = await req.json()
     project_id = data.get("project_id")
     if not project_id:
         return JSONResponse(status_code=400, content={"error": "project_id missing"})
