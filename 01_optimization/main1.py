@@ -112,7 +112,7 @@ def main():
 
      # ➕ Launch tile server temporarily for tiling and upload
     os.environ["PROJECT_ID"] = project_id
-    subprocess.run(["python", "tile_launcher.py"], cwd="tile_server")
+    subprocess.run(["python", "tile_server/tile_launcher.py"], check=True)
 
 if __name__ == "__main__":
     main()
