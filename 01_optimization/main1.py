@@ -6,7 +6,8 @@ import rasterio
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 from utils import get_latest_coordinates, get_supabase_client
 import subprocess
-
+import time
+import requests
 
 warnings.filterwarnings("ignore")
 
@@ -62,6 +63,20 @@ def upload_rasters_to_supabase(files_dict, project_id):
     client.table("projects").update(update_fields).eq("id", project_id).execute()
     print("📡 Updated project with raster URLs.")
 
+def wait_until_server_ready(url, timeout=60):
+    print("⏳ Waiting for tile server to be ready...")
+    for _ in range(timeout):
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                print("✅ Tile server is ready")
+                return True
+        except requests.exceptions.ConnectionError:
+            pass
+        time.sleep(1)
+    print("❌ Tile server did not start in time")
+    return False
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--buffer_km", type=int, default=10)
@@ -98,8 +113,6 @@ def main():
     patch_grid = grid.create_patch_grid(rasters["study_area"], grid_size=1000)
     valid_patches = grid.extract_patch_statistics(patch_grid, rasters)
 
-    
-
     # Export valid patches for next step
     valid_path = os.path.join(args.output, "valid_patches.geojson")
     valid_patches.to_file(valid_path, driver="GeoJSON")
@@ -110,9 +123,18 @@ def main():
 
     print("✅ Preprocessing complete.")
 
-     # ➕ Launch tile server temporarily for tiling and upload
+    # ➕ Launch tile server temporarily for tiling and upload
     os.environ["PROJECT_ID"] = project_id
-    subprocess.run(["python", "tile_server/tile_launcher.py"], check=True)
+    process = subprocess.Popen(["gunicorn", "app:app", "--bind", "0.0.0.0:8000"], cwd="tile_server")
+
+    if wait_until_server_ready("http://localhost:8000/health"):
+        response = requests.post("http://localhost:8000/run-tiling", json={"project_id": project_id})
+        print(f"🔁 Response: {response.status_code} {response.reason}")
+    else:
+        print("🛑 Tiling skipped due to server startup failure")
+
+    process.terminate()
+    print("🛑 Tile server stopped")
 
 if __name__ == "__main__":
     main()
