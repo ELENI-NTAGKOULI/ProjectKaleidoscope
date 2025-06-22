@@ -3,6 +3,7 @@ import time
 import requests
 import os
 
+
 def start_tile_server():
     process = subprocess.Popen(
         [
