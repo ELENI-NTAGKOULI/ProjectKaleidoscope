@@ -125,7 +125,11 @@ def main():
 
     # ➕ Launch tile server temporarily for tiling and upload
     os.environ["PROJECT_ID"] = project_id
-    process = subprocess.Popen(["gunicorn", "app:app", "--bind", "0.0.0.0:8000"], cwd="tile_server")
+    process = subprocess.Popen(
+    ["gunicorn", "app:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"],
+    cwd="tile_server"
+    )
+
 
     if wait_until_server_ready("http://localhost:8000/health"):
         response = requests.post("http://localhost:8000/run-tiling", json={"project_id": project_id})
