@@ -127,6 +127,7 @@ def main():
     composite, composite_norm, extent = mcda.compute_composite(rasters)
 
 
+
     print("✅ Preprocessing complete.")
 
     # ➕ Launch tile server temporarily for tiling and upload
@@ -152,11 +153,12 @@ def main():
     # Save composite_norm
     np.save(os.path.join(RESULTS_DIR, "composite_norm.npy"), composite_norm)
 
+    # Ensure extent is float-serializable
     extent = {k: float(v) for k, v in extent.items()}
-    
+
+    # Save extent as JSON
     with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
         json.dump(extent, f)
-
 
 
     print("📁 Saved preprocessing results to 05_results/")

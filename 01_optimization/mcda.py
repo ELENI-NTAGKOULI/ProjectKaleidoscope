@@ -54,6 +54,3 @@ def compute_composite(rasters, layer_names=None, weights=None):
     }
 
     return composite, composite_norm, extent
-    
-    return composite, composite_norm
-

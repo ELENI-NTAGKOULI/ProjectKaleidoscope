@@ -1,6 +1,7 @@
 import os
 from supabase import create_client
 
+
 def get_supabase_client():
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_KEY")

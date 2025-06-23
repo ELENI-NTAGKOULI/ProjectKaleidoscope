@@ -40,7 +40,7 @@ print("🖼️ Generating MCDA overlay plot...")
 plot_mcda_overlay(
     composite_norm=composite_norm,
     extent=extent,
-    selected_geometries=[valid_patches.geometry.iloc[p[0]] for p in hof_all_runs[0]],
+    selected_geometries = [valid_patches.geometry.iloc[p] for p in hof_all_runs[0]],
     patch_grid=valid_patches
 )
 mcda_path = os.path.join(EXPORT_DIR, "mcda_overlay.png")
