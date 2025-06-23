@@ -22,6 +22,15 @@ def run_optimization():
     except subprocess.CalledProcessError as e:
         return jsonify({"status": "error", "message": f"Optimization failed: {e}"}), 500
 
+@app.route("/generate-plots", methods=["POST"])
+def generate_plots():
+    try:
+        subprocess.run(["python", "03_frontend/generate_plots.py"], check=True)
+        return jsonify({"status": "success", "message": "Plots generated and uploaded to Supabase"}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({"status": "error", "message": f"Plot generation failed: {e}"}), 500
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
