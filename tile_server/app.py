@@ -6,7 +6,6 @@ import requests
 from rio_tiler.io import COGReader
 from mercantile import tiles
 from tempfile import NamedTemporaryFile
-from utils import tile_exists
 
 
 app = FastAPI()
