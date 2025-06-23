@@ -54,7 +54,7 @@ def plot_2d_pareto_fronts(hof_all_runs, valid_patches, objective_cols):
     num_runs = len(hof_all_runs)
     colors = plt.cm.tab10(np.linspace(0, 1, num_runs))
     n = len(objective_cols)
-    fig, axes = plt.subplots(n - 1, n - 1, figsize=(20, 20))
+    fig, axes = plt.subplots(n - 1, n - 1, figsize=(20, 20), squeeze=False)
     fig.suptitle("2D Pareto Front Projections", fontsize=20)
 
     for i, obj1 in enumerate(objective_cols[:-1]):
