@@ -62,8 +62,8 @@ def plot_2d_pareto_fronts(hof_all_runs, valid_patches, objective_cols):
             if i < j:
                 ax = axes[j - 1, i]
                 for run_idx, hof in enumerate(hof_all_runs):
-                    vals1 = [valid_patches.iloc[p[0]][obj1] for p in hof]
-                    vals2 = [valid_patches.iloc[p[0]][obj2] for p in hof]
+                    vals1 = [valid_patches.iloc[p][obj1] for p in hof]
+                    vals2 = [valid_patches.iloc[p][obj2] for p in hof]
                     ax.scatter(vals1, vals2, color=colors[run_idx], s=40, label=f'Run {run_idx + 1}', alpha=0.7)
                 ax.set_xlabel(obj1)
                 ax.set_ylabel(obj2)
