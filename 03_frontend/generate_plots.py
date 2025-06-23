@@ -31,7 +31,8 @@ hof_path = os.path.join(RESULTS_DIR, "hof_all_runs.pkl")
 valid_patches = gpd.read_file(valid_patches_path)
 composite_norm = np.load(composite_path)
 with open(extent_path) as f:
-    extent = json.load(f)
+    extent_dict = json.load(f)
+    extent = [extent_dict["left"], extent_dict["right"], extent_dict["bottom"], extent_dict["top"]]
 with open(hof_path, "rb") as f:
     hof_all_runs = pickle.load(f)
 

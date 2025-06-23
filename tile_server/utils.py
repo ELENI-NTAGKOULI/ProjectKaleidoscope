@@ -25,3 +25,16 @@ def get_latest_coordinates():
         return float(coords['lng']), float(coords['lat'])
     else:
         raise ValueError("No coordinates found in Supabase table")
+    
+def tile_exists(tile_bounds, cog_bounds):
+    """
+    Returns True if tile_bounds intersects with cog_bounds.
+    Both inputs are (left, bottom, right, top).
+    """
+    t_left, t_bottom, t_right, t_top = tile_bounds
+    c_left, c_bottom, c_right, c_top = cog_bounds
+
+    return not (
+        t_right < c_left or t_left > c_right or
+        t_top < c_bottom or t_bottom > c_top
+    )
