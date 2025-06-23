@@ -1,6 +1,7 @@
 # mcda.py
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+from rasterio.transform import array_bounds
 
 
 def compute_composite(rasters, layer_names=None, weights=None):
@@ -40,4 +41,10 @@ def compute_composite(rasters, layer_names=None, weights=None):
 
     composite_norm = (composite - np.nanmin(composite)) / (np.nanmax(composite) - np.nanmin(composite))
     print("✅ Composite suitability map computed")
+
+    # Calculate extent
+    height, width = composite_norm.shape
+    transform = rasters[layer_names[0]].transform
+    extent = array_bounds(height, width, transform)
+    
     return composite, composite_norm

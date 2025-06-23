@@ -80,6 +80,9 @@ def wait_until_server_ready(url, timeout=60):
     return False
 
 def main():
+    RESULTS_DIR = "05_results"
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--buffer_km", type=int, default=10)
     parser.add_argument("--output", type=str, default="05_results")
@@ -121,7 +124,7 @@ def main():
     print(f"📤 Saved valid patches to {valid_path}")
 
     # Run MCDA and export composite (automatically handled in mcda)
-    mcda.compute_composite(rasters)
+    composite_norm, extent = mcda.compute_composite(rasters)
 
     print("✅ Preprocessing complete.")
 
