@@ -157,8 +157,14 @@ def main():
     extent = {k: float(v) for k, v in extent.items()}
 
     # Save extent as JSON
+    extent_dict = {
+        "left": extent[2],
+        "right": extent[3],
+        "bottom": extent[0],
+        "top": extent[1]
+    }
     with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
-        json.dump(extent, f)
+        json.dump(extent_dict, f)
 
 
     print("📁 Saved preprocessing results to 05_results/")

@@ -7,6 +7,7 @@ from rio_tiler.io import COGReader
 from mercantile import tiles
 from tempfile import NamedTemporaryFile
 from utils import tile_exists
+from mercantile import bounds as tile_bounds
 
 
 
@@ -52,7 +53,7 @@ async def run_tiling(request: Request):
 
                 for z in range(min_zoom, max_zoom + 1):
                     for tile in tiles(*bounds, z):
-                        if not tile_exists(cog.tile_bounds(tile.x, tile.y, tile.z), bounds):
+                        if not tile_exists(tile_bounds(tile.x, tile.y, tile.z), bounds):
                             continue
 
                         try:
