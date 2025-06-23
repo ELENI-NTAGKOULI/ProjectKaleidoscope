@@ -18,6 +18,8 @@ def main():
 
     print("\n🔹 Step 2: NSGA-II Optimization")
 
+    os.makedirs(args.output, exist_ok=True)
+
     # Load valid patches
     valid_path = os.path.join(args.output, "valid_patches.geojson")
     valid_patches = gpd.read_file(valid_path)
