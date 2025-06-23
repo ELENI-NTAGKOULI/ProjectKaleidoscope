@@ -157,12 +157,14 @@ def main():
     extent = {k: float(v) for k, v in extent.items()}
 
     # Save extent as JSON
+    # extent είναι λίστα ή tuple όπως (left, right, bottom, top)
     extent_dict = {
-        "left": float(extent["left"]),
-        "right": float(extent["right"]),
-        "bottom": float(extent["bottom"]),
-        "top": float(extent["top"])
+        "left": float(extent["minx"]),
+        "right": float(extent["maxx"]),
+        "bottom": float(extent["miny"]),
+        "top": float(extent["maxy"])
     }
+
     with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
         json.dump(extent_dict, f, indent=2)
 

@@ -45,6 +45,6 @@ if __name__ == "__main__":
             print(f"📡 Triggering tiling for project {project_id}")
             response = requests.post("http://localhost:8000/run-tiling", json={"project_id": project_id})
             print("🔁 Response:", response.status_code, response.text)
-            time.sleep(2)
+            time.sleep(20)
     finally:
         stop_tile_server(p)
