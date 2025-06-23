@@ -151,9 +151,10 @@ def main():
     # Save composite_norm
     np.save(os.path.join(RESULTS_DIR, "composite_norm.npy"), composite_norm)
 
-    # Save extent
+    # Save extent safely
+    extent_dict = extent._asdict() if hasattr(extent, "_asdict") else dict(extent)
     with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
-        json.dump(extent._asdict(), f)
+        json.dump(extent_dict, f)
 
 
     print("📁 Saved preprocessing results to 05_results/")
