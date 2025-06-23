@@ -42,9 +42,18 @@ def compute_composite(rasters, layer_names=None, weights=None):
     composite_norm = (composite - np.nanmin(composite)) / (np.nanmax(composite) - np.nanmin(composite))
     print("✅ Composite suitability map computed")
 
-    # Calculate extent
+    # Calculate extent properly
     height, width = composite_norm.shape
     transform = rasters[layer_names[0]].transform
-    extent = array_bounds(height, width, transform)
+    bounds = array_bounds(height, width, transform)
+    extent = {
+        "minx": float(bounds[0]),
+        "miny": float(bounds[1]),
+        "maxx": float(bounds[2]),
+        "maxy": float(bounds[3])
+    }
+
+    return composite, composite_norm, extent
     
     return composite, composite_norm
+

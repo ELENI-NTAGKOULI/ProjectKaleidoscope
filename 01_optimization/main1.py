@@ -124,7 +124,7 @@ def main():
     print(f"📤 Saved valid patches to {valid_path}")
 
     # Run MCDA and export composite (automatically handled in mcda)
-    composite_norm, _ = mcda.compute_composite(rasters)
+    composite, composite_norm, extent = mcda.compute_composite(rasters)
 
 
     print("✅ Preprocessing complete.")
@@ -151,6 +151,12 @@ def main():
 
     # Save composite_norm
     np.save(os.path.join(RESULTS_DIR, "composite_norm.npy"), composite_norm)
+
+    extent = {k: float(v) for k, v in extent.items()}
+    
+    with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
+        json.dump(extent, f)
+
 
 
     print("📁 Saved preprocessing results to 05_results/")
