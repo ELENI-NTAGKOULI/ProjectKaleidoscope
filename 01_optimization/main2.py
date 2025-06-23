@@ -7,6 +7,7 @@ from nsga import run_nsga_pipeline, create_results_dataframe
 import export_utils
 from supabase import create_client
 from datetime import datetime, timezone
+import pickle
 
 warnings.filterwarnings("ignore")
 
@@ -43,6 +44,11 @@ def main():
     upload_to_supabase(final_df)
 
     print("✅ Optimization and export complete.")
+
+    hof_path = os.path.join(args.output, "hof_all_runs.pkl")
+    with open(hof_path, "wb") as f:
+        pickle.dump(raw_selected, f)
+    print(f"💾 Saved HOF to {hof_path}")
 
 def upload_to_supabase(df):
     url = os.environ.get("SUPABASE_URL")

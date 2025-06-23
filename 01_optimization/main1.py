@@ -8,6 +8,8 @@ from utils import get_latest_coordinates, get_supabase_client
 import subprocess
 import time
 import requests
+import json
+import numpy as np
 
 warnings.filterwarnings("ignore")
 
@@ -139,6 +141,18 @@ def main():
 
     process.terminate()
     print("🛑 Tile server stopped")
+
+    # Save valid_patches
+    valid_patches.to_file(os.path.join(RESULTS_DIR, "valid_patches.geojson"), driver="GeoJSON")
+
+    # Save composite_norm
+    np.save(os.path.join(RESULTS_DIR, "composite_norm.npy"), composite_norm)
+
+    # Save extent
+    with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
+        json.dump(extent, f)
+
+    print("📁 Saved preprocessing results to 05_results/")
 
 if __name__ == "__main__":
     main()
