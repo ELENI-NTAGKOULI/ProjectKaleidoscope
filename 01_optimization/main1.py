@@ -13,20 +13,6 @@ import numpy as np
 
 warnings.filterwarnings("ignore")
 
-def extent_to_dict(extent):
-    """Convert bounding box to dict safely."""
-    if hasattr(extent, "_asdict"):
-        return extent._asdict()
-    elif isinstance(extent, (tuple, list)) and len(extent) == 4:
-        return {
-            "minx": extent[0],
-            "miny": extent[1],
-            "maxx": extent[2],
-            "maxy": extent[3]
-        }
-    else:
-        raise ValueError(f"Cannot convert extent of type {type(extent)} with value: {extent}")
-
 def reproject_to_web_mercator(input_path, output_path):
     with rasterio.open(input_path) as src:
         transform, width, height = calculate_default_transform(
@@ -138,7 +124,8 @@ def main():
     print(f"📤 Saved valid patches to {valid_path}")
 
     # Run MCDA and export composite (automatically handled in mcda)
-    composite_norm, extent = mcda.compute_composite(rasters)
+    composite_norm, _ = mcda.compute_composite(rasters)
+
 
     print("✅ Preprocessing complete.")
 
@@ -164,11 +151,6 @@ def main():
 
     # Save composite_norm
     np.save(os.path.join(RESULTS_DIR, "composite_norm.npy"), composite_norm)
-
-    # Save extent safely
-    extent_dict = extent_to_dict(extent)
-    with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
-        json.dump(extent_dict, f)
 
 
     print("📁 Saved preprocessing results to 05_results/")
