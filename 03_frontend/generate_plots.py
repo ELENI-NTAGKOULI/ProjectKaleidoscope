@@ -41,7 +41,11 @@ print("🖼️ Generating MCDA overlay plot...")
 plot_mcda_overlay(
     composite_norm=composite_norm,
     extent=extent,
-    selected_geometries = [valid_patches.geometry.iloc[p] for p in hof_all_runs[0]],
+    selected_geometries = [
+    valid_patches.geometry.iloc[p]
+        for run in hof_all_runs
+        for p in run
+    ],
     patch_grid=valid_patches
 )
 mcda_path = os.path.join(EXPORT_DIR, "mcda_overlay.png")
@@ -67,4 +71,18 @@ def upload_file_to_supabase(path, remote_path, bucket="plots"):
 upload_file_to_supabase(mcda_path, f"{PROJECT_ID}/mcda_overlay.png")
 upload_file_to_supabase(pareto_path, f"{PROJECT_ID}/pareto_fronts.png")
 
+print("🖼️ Generating selected 2D Pareto front...")
+
+plot_2d_pareto_fronts(
+    hof_all_runs=[hof_all_runs[0]],
+    valid_patches=valid_patches,
+    objective_cols=['landcoverSuitability', 'floodRisk']
+)
+simple_pareto_path = os.path.join(EXPORT_DIR, "pareto_selected.png")
+plt.savefig(simple_pareto_path, dpi=300)
+plt.close()
+
+upload_file_to_supabase(simple_pareto_path, f"{PROJECT_ID}/pareto_selected.png")
+
 print("✅ All plots saved and uploaded to Supabase in", EXPORT_DIR)
+
