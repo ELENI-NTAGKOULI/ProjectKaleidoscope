@@ -153,7 +153,8 @@ def main():
 
     # Save extent
     with open(os.path.join(RESULTS_DIR, "extent.json"), "w") as f:
-        json.dump(extent, f)
+        json.dump(extent._asdict(), f)
+
 
     print("📁 Saved preprocessing results to 05_results/")
 
