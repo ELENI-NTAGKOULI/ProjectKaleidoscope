@@ -58,10 +58,10 @@ def upload_to_supabase(df):
     table = os.environ.get("SUPABASE_RESULTS_TABLE", "results")
     client = create_client(url, key)
 
-    top5 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(5)
+    top20 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(20)
 
     rows = []
-    for _, row in top5.iterrows():
+    for _, row in top20.iterrows():
         rows.append({
             "patch_id": int(row["patch_id"]),
             "centroid_latitude": float(row["centroid_latitude"]),
@@ -77,7 +77,7 @@ def upload_to_supabase(df):
         })
 
     client.table(table).insert(rows).execute()
-    print("🟢 Uploaded top 5 to Supabase.")
+    print("🟢 Uploaded top 20 to Supabase.")
 
 if __name__ == "__main__":
     main()
