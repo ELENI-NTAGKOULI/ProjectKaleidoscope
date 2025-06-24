@@ -25,7 +25,7 @@ async def run_tiling(request: Request):
     supabase = get_supabase_client()
     bucket = "tile-exports"
 
-    # Τα layers που θες να κάνεις tiling
+    # Τα layers που θες να κάνεις tilin
     layers = ["study_area", "urbanProximity", "slope", "soil", "landcoverSuitability", "floodRisk"]
 
     for layer in layers:
