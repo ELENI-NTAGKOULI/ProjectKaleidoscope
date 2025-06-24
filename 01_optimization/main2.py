@@ -42,7 +42,7 @@ def main():
     gdf.to_file(geojson_path, driver="GeoJSON")
     print(f"📤 Saved GeoJSON to {geojson_path}")
 
-    # Optional: upload top 5 to Supabase
+    # Optional: upload top 10 to Supabase
     upload_to_supabase(final_df)
 
     print("✅ Optimization and export complete.")
@@ -58,10 +58,10 @@ def upload_to_supabase(df):
     table = os.environ.get("SUPABASE_RESULTS_TABLE", "results")
     client = create_client(url, key)
 
-    top20 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(20)
+    top10 = df.sort_values("overall_score", ascending=False).drop_duplicates("patch_id").head(10)
 
     rows = []
-    for _, row in top20.iterrows():
+    for _, row in top10.iterrows():
         rows.append({
             "patch_id": int(row["patch_id"]),
             "centroid_latitude": float(row["centroid_latitude"]),
@@ -77,7 +77,7 @@ def upload_to_supabase(df):
         })
 
     client.table(table).insert(rows).execute()
-    print("🟢 Uploaded top 20 to Supabase.")
+    print("🟢 Uploaded top 10 to Supabase.")
 
 if __name__ == "__main__":
     main()
