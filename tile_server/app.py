@@ -25,7 +25,7 @@ async def run_tiling(request: Request):
         return JSONResponse(status_code=400, content={"error": "Missing project_id"})
 
     supabase = get_supabase_client()
-    bucket = "raster-exports"
+    bucket = "tile-exports"
 
     # Τα layers που θες να κάνεις tiling
     layers = ["study_area", "urbanProximity", "slope", "soil", "landcoverSuitability", "floodRisk"]
