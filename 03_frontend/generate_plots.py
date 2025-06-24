@@ -52,9 +52,15 @@ mcda_path = os.path.join(EXPORT_DIR, "mcda_overlay.png")
 plt.savefig(mcda_path, dpi=300)
 plt.close()
 
+# === SAFE GROUPING για PARETO ===
 print("🖼️ Generating 2D Pareto fronts plot...")
+if isinstance(hof_all_runs[0], int):  # flat list (25 patches)
+    hof_all_runs_grouped = [hof_all_runs[i:i+5] for i in range(0, len(hof_all_runs), 5)]
+else:
+    hof_all_runs_grouped = hof_all_runs
+
 plot_2d_pareto_fronts(
-    hof_all_runs=hof_all_runs,
+    hof_all_runs=hof_all_runs_grouped,
     valid_patches=valid_patches,
     objective_cols=['landcoverSuitability', 'slope', 'soil', 'floodRisk', 'urbanProximity']
 )
